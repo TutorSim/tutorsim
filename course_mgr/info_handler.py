@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackContext
 
-from telegram_mgr.course_info import CourseInfo
+from course_mgr.course_info import CourseInfo
 
 class InfoHandler():
     def __init__(self, info:CourseInfo):

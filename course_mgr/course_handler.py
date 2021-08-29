@@ -3,12 +3,12 @@ from telegram.ext import  CommandHandler, ConversationHandler, CallbackContext
 
 import pygsheets
 
-from telegram_mgr.init_handler import InitHandler
-from telegram_mgr.register_handler import RegisterHandler
-from telegram_mgr.info_handler import InfoHandler
-from telegram_mgr.score_handler import ScoreHandler
+from course_mgr.init_handler import InitHandler
+from course_mgr.register_handler import RegisterHandler
+from course_mgr.info_handler import InfoHandler
+from course_mgr.score_handler import ScoreHandler
 
-from telegram_mgr.course_info import CourseInfo
+from course_mgr.course_info import CourseInfo
 
 import logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -23,10 +23,9 @@ class CourseHandler():
 
         # Internal usages
         self.state_map = {state:idx for idx, state in enumerate(telegram_states)}
-        self.handlers = [
+        self.handlers = [InfoHandler(course),
                          InitHandler(self.state_map, self.sh),
-                         RegisterHandler(self.state_map, self.sh),
-                         InfoHandler(course),]
+                         RegisterHandler(self.state_map, self.sh),]
 
         for content in course.get_course_contents():
             self.handlers.append(ScoreHandler(self.state_map, self.sh, content))
@@ -45,10 +44,17 @@ class CourseHandler():
                 ConversationHandler.END:ConversationHandler.END
             }
         )
-        return [conv]
+        return conv
 
     def greeting(self, update: Update, context: CallbackContext) -> None:
-        update.message.reply_text(f"{self.course.course_id}")
+        resp = f"{self.course.course_id} 수업을 선택하셨습니다.\n"
+        for handler in self.handlers:
+            resp += handler.get_help()
+            resp += "\n"
+
+        update.message.reply_text(resp)
+
+        
         return self.state_map["CONV_START"]
     
     def cancel(self, update: Update, context: CallbackContext) -> int:
