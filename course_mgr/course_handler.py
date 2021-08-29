@@ -30,8 +30,6 @@ class CourseHandler():
         for content in course.get_course_contents():
             self.handlers.append(ScoreHandler(self.state_map, self.sh, content))
 
-        #self.handlers.append(CommandHandler('help', self.help))
-
     def get_conv_handler(self):
         conv_handlers = [x.get_handler() for x in self.handlers]
         conv_handlers.append(CommandHandler('help', self.help))
@@ -54,7 +52,6 @@ class CourseHandler():
 
         update.message.reply_text(resp)
 
-        
         return self.state_map["CONV_START"]
     
     def cancel(self, update: Update, context: CallbackContext) -> int:
@@ -64,14 +61,12 @@ class CourseHandler():
         return ConversationHandler.END
 
     def help(self, update: Update, context: CallbackContext) -> None:
-        """Send a message when the command /start is issued."""
-        #context.user_data.clear()
-
         resp = ""
         for handler in self.handlers:
             resp += handler.get_help()
             resp += "\n"
-
+        
+        resp += "처음부터 다시 시작하려면 /cancel 명령어를 사용합니다.\n"
         update.message.reply_text(resp)    
         
 

@@ -44,7 +44,7 @@ class ScoreHandler():
     def show_menu(self, update: Update, context: CallbackContext) -> int:
         if (row := self.check_registered_user(update.effective_user.id)) > 0:
             context.user_data['gs_user_row'] = row
-            update.message.reply_text("점수만 확인하려면 /summary를 입력하세요.\n자세한 정보를 확인하려면 /detail을 입력하세요.")
+            update.message.reply_text("/summary: 점수만 확인 \n/detail: 자세한 정보를 확인")
             return self.state_map["HANDLE_SUMMARY_DETAIL"]
         else:
             update.message.reply_text("사용자 등록을 먼저 하시길 바랍니다.")
