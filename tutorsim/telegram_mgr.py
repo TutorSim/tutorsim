@@ -2,7 +2,7 @@ from telegram.ext.conversationhandler import ConversationHandler
 import contexts
 
 from telegram import Update
-from telegram.ext import  Updater, CommandHandler, CallbackContext
+from telegram.ext import  Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 
 import pygsheets
 from telegram.ext.dispatcher import Dispatcher
@@ -33,6 +33,7 @@ class TelegramManager():
             
         dp.add_handler(CommandHandler('start', self.start))
         dp.add_handler(CommandHandler('help', self.help))
+        dp.add_handler(MessageHandler(Filters.text & ~Filters.command, self.handle_wrong_commands))
         
     def start(self, update: Update, context: CallbackContext) -> None:
         text = "확인하고자 하는 과목을 입력해주세요.\n"
@@ -41,6 +42,10 @@ class TelegramManager():
         update.message.reply_text(text)
     
     def help(self, update: Update, context: CallbackContext) -> None:
+        text = "시작하시려면 명령어 /start 로 시작하세요."
+        update.message.reply_text(text)
+
+    def handle_wrong_commands(self, update: Update, context: CallbackContext) -> None:
         text = "시작하시려면 명령어 /start 로 시작하세요."
         update.message.reply_text(text)
 

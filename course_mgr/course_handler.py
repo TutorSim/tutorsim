@@ -49,9 +49,8 @@ class CourseHandler():
         for handler in self.handlers:
             resp += handler.get_help()
             resp += "\n"
-
+        resp += "처음부터 다시 시작하려면 /cancel 명령어를 사용합니다.\n"
         update.message.reply_text(resp)
-
         return self.state_map["CONV_START"]
     
     def cancel(self, update: Update, context: CallbackContext) -> int:
@@ -65,7 +64,6 @@ class CourseHandler():
         for handler in self.handlers:
             resp += handler.get_help()
             resp += "\n"
-        
         resp += "처음부터 다시 시작하려면 /cancel 명령어를 사용합니다.\n"
         update.message.reply_text(resp)    
         
