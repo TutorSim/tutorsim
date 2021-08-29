@@ -16,7 +16,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-class Course():
+class CourseHandler():
     def __init__(self, telegram_states:list, sheet:pygsheets.Spreadsheet, course:CourseInfo) -> None:
         self.sh = sheet
         self.course = course
@@ -28,7 +28,7 @@ class Course():
                          RegisterHandler(self.state_map, self.sh),
                          InfoHandler(course),]
 
-        for content in CourseInfo.SCORE_CONTENTS:
+        for content in course.get_course_contents():
             self.handlers.append(ScoreHandler(self.state_map, self.sh, content))
 
         #self.handlers.append(CommandHandler('help', self.help))

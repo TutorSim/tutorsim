@@ -1,9 +1,10 @@
 from telegram import Update
 from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackContext
 
-from config import Info
+from telegram_mgr.course_info import CourseInfo
+
 class InfoHandler():
-    def __init__(self, info:Info):
+    def __init__(self, info:CourseInfo):
         self.information = info
         self.handler = CommandHandler('info', self.info)
             
@@ -19,5 +20,5 @@ class InfoHandler():
         context.user_data.clear()
 
     def info(self, update: Update, context: CallbackContext) -> None:
-        text = f"담당교수:{self.information.PROFESSOR_NAME}\n메일주소:{self.information.CONTACT_EMAIL}\n전화번호:{self.information.CONTACT_OFFICE}\n"
+        text = self.information.get_text()
         update.message.reply_text(text)

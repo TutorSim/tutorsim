@@ -21,15 +21,15 @@ from telegram_mgr.course_info import CourseInfo
 
 logger = logging.getLogger(__name__)
 
-from telegram_mgr.telegram_mgr import Course
+from telegram_mgr.course_handler import CourseHandler
 
 gc = pygsheets.authorize(service_file=GOOGLE_SERVICE_KEY)
 sh = gc.open('2021 COME1103')
 
 updater = Updater(TELEGRAM_API_KEY)
 print(STATES)
-c1 = Course(STATES, sh, CourseInfo("COME1101"))
-c2 = Course(STATES, sh, CourseInfo("COME1103"))
+c1 = CourseHandler(STATES, sh, CourseInfo("COME1101"))
+c2 = CourseHandler(STATES, sh, CourseInfo("COME1103"))
 
 def start(update: Update, context: CallbackContext) -> int:
     text = "확인하고자 하는 과목을 입력해주세요."
