@@ -17,11 +17,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 
-from telegram_mgr.course_info import CourseInfo
+from course_mgr.course_info import CourseInfo
+from course_mgr.course_handler import CourseHandler
 
 logger = logging.getLogger(__name__)
-
-from telegram_mgr.course_handler import CourseHandler
 
 gc = pygsheets.authorize(service_file=GOOGLE_SERVICE_KEY)
 sh = gc.open('2021 COME1103')
