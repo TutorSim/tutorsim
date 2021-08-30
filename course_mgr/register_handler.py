@@ -24,6 +24,9 @@ class RegisterHandler():
                 ]
             },
             fallbacks=[CommandHandler('cancel', self.cancel)],
+            map_to_parent={
+                ConversationHandler.END:ConversationHandler.END
+            },
         )
 
     def get_handler(self) -> Dispatcher:

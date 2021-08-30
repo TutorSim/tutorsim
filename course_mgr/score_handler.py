@@ -17,6 +17,9 @@ class ScoreHandler():
                 ]
             },
             fallbacks=[CommandHandler('cancel', self.cancel)],
+            map_to_parent={
+                ConversationHandler.END:ConversationHandler.END
+            },
         )
 
     def get_handler(self) -> Dispatcher:
@@ -29,6 +32,7 @@ class ScoreHandler():
         """Display the gathered info and end the conversation."""
         context.user_data.clear()
         update.message.reply_text("취소 되었습니다.")
+        update.message.reply_text("과목을 선택하여 주")
         return ConversationHandler.END
     
     def check_registered_user(self, _id:int) -> int:
