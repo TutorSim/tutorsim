@@ -3,11 +3,15 @@ from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, Co
 
 from pygsheets import Spreadsheet
 
+from course_mgr.course_info import CourseInfo
+
 class ScoreHandler():
-    def __init__(self,state_map:dict, sh:Spreadsheet, sh_name:str):
+    def __init__(self, course:CourseInfo, state_map:dict, sh:Spreadsheet, sh_name:str):
         self.state_map = state_map
         self.sh = sh
         self.sheet_name = sh_name
+        self.course = course
+        
         self.handler = ConversationHandler(
             entry_points=[CommandHandler(sh_name, self.show_menu)],
             states={
@@ -18,8 +22,9 @@ class ScoreHandler():
             },
             fallbacks=[CommandHandler('cancel', self.cancel)],
             map_to_parent={
+                self.state_map["CONV_END"]:self.state_map["CONV_START"],
                 ConversationHandler.END:ConversationHandler.END
-            },
+            }
         )
 
     def get_handler(self) -> Dispatcher:
@@ -32,7 +37,7 @@ class ScoreHandler():
         """Display the gathered info and end the conversation."""
         context.user_data.clear()
         update.message.reply_text("취소 되었습니다.")
-        update.message.reply_text("과목을 선택하여 주")
+        update.message.reply_text("새로 시작하시려면 /start 명령어를 사용하세요.")
         return ConversationHandler.END
     
     def check_registered_user(self, _id:int) -> int:
@@ -52,15 +57,19 @@ class ScoreHandler():
             return self.state_map["HANDLE_SUMMARY_DETAIL"]
         else:
             update.message.reply_text("사용자 등록을 먼저 하시길 바랍니다.")
-            return ConversationHandler.END
+            return self.state_map["CONV_END"]
 
     def summary(self, update: Update, context: CallbackContext) -> int:
         wks = self.sh.worksheet('title', self.sheet_name)
         df = wks.get_as_df()
         score = df.loc[context.user_data['gs_user_row'],'Total']
         update.message.reply_text(f"당신의 {self.sheet_name}의 점수는 {score}입니다.")
+        
+        update.message.reply_text(self.course.get_text())
+        update.message.reply_text("명령어 목록을 확인하시려면 /help 명령어를 입력하세요.")
+        
         context.user_data.clear()
-        return ConversationHandler.END
+        return self.state_map["CONV_END"]
 
     def detail(self, update: Update, context: CallbackContext) -> int:
         wks = self.sh.worksheet('title', self.sheet_name)
@@ -76,5 +85,8 @@ class ScoreHandler():
             response += f"{col}: {values[idx]}\n"
             
         update.message.reply_text(f"당신의 구체적인 {self.sheet_name}의 점수는 다음과 같습니다.\n{response}")
+        
+        update.message.reply_text(self.course.get_text())
+        update.message.reply_text("명령어 목록을 확인하시려면 /help 명령어를 입력하세요.")
         context.user_data.clear()
-        return ConversationHandler.END
+        return self.state_map["CONV_END"]

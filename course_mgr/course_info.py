@@ -14,7 +14,7 @@ class CourseInfo:
         self.contents = contents
         
     def get_text(self) -> str:
-        return f"{self.course_id} {self.course_name} \n 담당교수:{self.prof_name}\n메일주소:{self.prof_email}\n전화번호:{self.prof_phone}\n"
+        return f"{self.course_id} {self.course_name} \n담당교수:{self.prof_name}\n메일주소:{self.prof_email}\n전화번호:{self.prof_phone}\n"
 
     def get_course_contents(self) -> list:
         return self.contents

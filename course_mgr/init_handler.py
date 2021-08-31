@@ -1,12 +1,14 @@
 from telegram import Update
 from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackContext
 
+from course_mgr.course_info import CourseInfo
 from pygsheets import Spreadsheet
 
 class InitHandler():
-    def __init__(self,state_map:dict, sh:Spreadsheet):
+    def __init__(self, course:CourseInfo, state_map:dict, sh:Spreadsheet):
         self.state_map = state_map
         self.sh = sh
+        self.course = course
 
         self.handler = ConversationHandler(
             entry_points=[CommandHandler('init', self.handle_init_start)],
@@ -24,6 +26,10 @@ class InitHandler():
                 ]
             },
             fallbacks=[CommandHandler('cancel', self.cancel)],
+            map_to_parent={
+                self.state_map["CONV_END"]:self.state_map["CONV_START"],
+                ConversationHandler.END:ConversationHandler.END
+            }
         )
 
     def get_handler(self) -> Dispatcher:
@@ -34,6 +40,8 @@ class InitHandler():
 
     def cancel(self, update: Update, context: CallbackContext) -> int:
         """Display the gathered info and end the conversation."""
+        update.message.reply_text("취소 되었습니다.")
+        update.message.reply_text("새로 시작하시려면 /start 명령어를 사용하세요.")
         context.user_data.clear()
         return ConversationHandler.END
 
@@ -74,7 +82,7 @@ class InitHandler():
             if self.check_register_user(context.user_data['row']):
                 update.message.reply_text("이미 등록되어 있는 사용자입니다.\n비밀번호를 초기화하기 위해서는 담당교수님께 연락바랍니다.")
                 context.user_data.clear()
-                return ConversationHandler.END
+                return self.state_map["CONV_END"]
             else:
                 context.user_data['next_state'] = "GET_NEW_PWD"
 
@@ -82,14 +90,17 @@ class InitHandler():
                 return self.state_map[context.user_data['next_state']]
         else:
             update.message.reply_text("수강신청 등록이 안된 사용자입니다.\n담당교수님께 확인하시길 바랍니다.")
+            
+            update.message.reply_text(self.course.get_text())
             context.user_data.clear()
-            return ConversationHandler.END
+            return self.state_map["CONV_END"]
 
     def handle_register_password(self, update: Update, context: CallbackContext) -> int:
         wks = self.sh.worksheet('title','password')
         wks.update_value('D'+str(context.user_data['row']), update.message.text)
         
         update.message.reply_text("새로운 비밀번호가 등록되었습니다.\n사용자등록을 해주시길 바랍니다.")
+        update.message.reply_text(self.course.get_text())
         
         context.user_data.clear()
-        return ConversationHandler.END
+        return self.state_map["CONV_END"]

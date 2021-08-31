@@ -3,10 +3,13 @@ from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, Co
 
 from pygsheets import Spreadsheet
 
+from course_mgr.course_info import CourseInfo
+
 class RegisterHandler():
-    def __init__(self,state_map:dict, sh:Spreadsheet):
+    def __init__(self, course:CourseInfo, state_map:dict, sh:Spreadsheet):
         self.state_map = state_map
         self.sh = sh
+        self.course = course
 
         self.handler = ConversationHandler(
             entry_points=[CommandHandler('register', self.handle_register_start)],
@@ -25,8 +28,9 @@ class RegisterHandler():
             },
             fallbacks=[CommandHandler('cancel', self.cancel)],
             map_to_parent={
+                self.state_map["CONV_END"]:self.state_map["CONV_START"],
                 ConversationHandler.END:ConversationHandler.END
-            },
+            }
         )
 
     def get_handler(self) -> Dispatcher:
@@ -35,10 +39,16 @@ class RegisterHandler():
     def get_help(self):
         return f"/register: Tutor봇으로 사용자 등록을 합니다. 다른 사람은 개인 점수를 확인하지 않도록 변경한 암호를 확인합니다."
 
+    def unknown(self, update: Update, context: CallbackContext) -> int:
+        context.user_data.clear()
+        update.message.reply_text("처리하지 못하였습니다.\n학번부터 다시 입력해주세요.")
+        return self.state_map["GET_STUDENT_ID"]
+
     def cancel(self, update: Update, context: CallbackContext) -> int:
         """Display the gathered info and end the conversation."""
         context.user_data.clear()
         update.message.reply_text("취소 되었습니다.")
+        update.message.reply_text("새로 시작하시려면 /start 명령어를 사용하세요.")
         return ConversationHandler.END
 
     def handle_unwanted_data(self, update: Update, context: CallbackContext) -> int:
@@ -71,8 +81,9 @@ class RegisterHandler():
             return self.state_map[context.user_data['next_state']]
         else:
             update.message.reply_text("수강신청 등록이 안된 사용자입니다.\n담당교수님께 확인하시길 바랍니다.")
+            update.message.reply_text(self.course.get_text())
             context.user_data.clear()
-            return ConversationHandler.END
+            return self.state_map["CONV_END"]
 
     def check_pasword(self, idx:int, pwd:str) -> bool:
         wks = self.sh.worksheet('title','password')
@@ -92,5 +103,6 @@ class RegisterHandler():
         else:
             update.message.reply_text("비밀번호가 맞지 않습니다. \n다시 시작하길 바랍니다.")
         
+        update.message.reply_text(self.course.get_text())
         context.user_data.clear()
-        return ConversationHandler.END
+        return self.state_map["CONV_END"]
