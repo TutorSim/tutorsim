@@ -10,11 +10,7 @@ from course_mgr.score_handler import ScoreHandler
 
 from course_mgr.course_info import CourseInfo
 
-import logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-
-logger = logging.getLogger(__name__)
+from course_mgr.exam_handler import ExamHandler
 
 class CourseHandler():
     def __init__(self, telegram_states:list, sheet:pygsheets.Spreadsheet, course:CourseInfo) -> None:
@@ -25,7 +21,8 @@ class CourseHandler():
         self.state_map = {state:idx for idx, state in enumerate(telegram_states)}
         self.handlers = [InfoHandler(course),
                          InitHandler(course, self.state_map, self.sh),
-                         RegisterHandler(course, self.state_map, self.sh),]
+                         RegisterHandler(course, self.state_map, self.sh),
+                         ExamHandler(self.sh),]
 
         for content in course.get_course_contents():
             self.handlers.append(ScoreHandler(course, self.state_map, self.sh, content))
