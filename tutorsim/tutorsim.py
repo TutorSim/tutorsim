@@ -23,11 +23,13 @@ from course_mgr.course_handler import CourseHandler
 logger = logging.getLogger(__name__)
 
 gc = pygsheets.authorize(service_file=GOOGLE_SERVICE_KEY)
-sh = gc.open('2021 COME1103')
+sh = gc.open('2021 COME1101')
 
 updater = Updater(TELEGRAM_API_KEY)
 print(STATES)
 c1 = CourseHandler(STATES, sh, CourseInfo("COME1101"))
+
+sh = gc.open('2021 COME1103')
 c2 = CourseHandler(STATES, sh, CourseInfo("COME1103"))
 
 def start(update: Update, context: CallbackContext) -> int:

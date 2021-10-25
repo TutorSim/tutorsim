@@ -9,8 +9,8 @@ GOOGLE_SERVICE_KEY='YOUR-GOOGLE-SERVICE-KEY.json'
 GOOGLE_SPREAD_SHEET='YOUR-GOOGLE-SPREADSHEET-NAME'
 
 import os
-if os.path.isfile("../instance/telegram_config.py"):
+if os.path.isfile("/root/instance/telegram_config.py"):
 	from instance.telegram_config import *
 
-if os.path.isfile("../instance/course_config.py"):
+if os.path.isfile("/root/instance/course_config.py"):
 	from instance.course_config import *

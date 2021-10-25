@@ -51,7 +51,7 @@ class ScoreHandler():
             return -1
 
     def show_menu(self, update: Update, context: CallbackContext) -> int:
-        if (row := self.check_registered_user(update.effective_user.id)) > 0:
+        if (row := self.check_registered_user(update.effective_user.id)) >= 0:
             context.user_data['gs_user_row'] = row
             update.message.reply_text("/summary: 점수만 확인 \n/detail: 자세한 정보를 확인")
             return self.state_map["HANDLE_SUMMARY_DETAIL"]

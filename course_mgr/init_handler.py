@@ -75,7 +75,7 @@ class InitHandler():
     def handle_change_password(self, update: Update, context: CallbackContext) -> int:
         user_id = int(update.message.text)
         
-        if (row := self.check_valid_user(user_id)) > 0:
+        if (row := self.check_valid_user(user_id)) >= 0:
             context.user_data['id'] = user_id        
             context.user_data['row'] = row +2
 
