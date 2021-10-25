@@ -1,3 +1,4 @@
+'''
 from telegram.ext.conversationhandler import ConversationHandler
 import contexts
 
@@ -28,6 +29,8 @@ sh = gc.open('2021 COME1103')
 updater = Updater(TELEGRAM_API_KEY)
 print(STATES)
 c1 = CourseHandler(STATES, sh, CourseInfo("COME1101"))
+
+sh = gc.open('2021 COME1101')
 c2 = CourseHandler(STATES, sh, CourseInfo("COME1103"))
 
 def start(update: Update, context: CallbackContext) -> int:
@@ -68,3 +71,4 @@ updater.dispatcher.add_handler(conv)
 updater.start_polling()
 updater.idle()
 
+'''
